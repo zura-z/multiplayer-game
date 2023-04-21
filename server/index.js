@@ -21,8 +21,6 @@ io.on("connection", (socket) => {
 
     io.to(room).emit("users-in-a-current-room", [...userQuantity]);
 
-
-
     socket.on("disconnect", () => {
       io.to(room).emit("users-in-a-current-room", [...userQuantity]);
     });
@@ -30,12 +28,11 @@ io.on("connection", (socket) => {
 
   socket.on("leave-room", (room) => {
     socket.leave(room);
-
+    
     socket.emit("current-room", "");
 
     const userQuantity = io.sockets.adapter.rooms.get(room);
-
-    io.to(room).emit("users-in-a-current-room", [...userQuantity]);
+    io.to(room).emit("users-in-a-current-room", [...userQuantity] || []);
   });
 });
 
