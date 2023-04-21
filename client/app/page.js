@@ -1,19 +1,9 @@
-"use client"
+import App from "./components/app";
 
-import { useState } from "react";
-import Rooms from "./components/rooms";
-import Game from "./components/game";
-
-function Home() {
-  const [gameStarted, setGameStarted] = useState(false);
-
+export default function Home() {
   return (
     <main>
-      {!gameStarted && <Rooms />}
-
-      {gameStarted && <Game />} 
+      <App />
     </main>
   );
 }
-
-export default Home;
