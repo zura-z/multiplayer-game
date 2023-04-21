@@ -1,35 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
+import { useState } from "react";
 
-export default function Rooms() {
+export default function Rooms({ socket, room, playersInRoom, setPlayersInRoom }) {
   const [input, setInput] = useState("");
-  const [room, setRoom] = useState("");
-
-  const [playersInRoom, setPlayersInRoom] = useState([]);
-
-  const [socket, setSocket] = useState(null);
-
-  useEffect(() => {
-    const newSocket = io("http://localhost:3001");
-    setSocket(newSocket);
-
-    newSocket.on("connect", () => {
-      console.log("connected");
-
-      newSocket?.on("current-room", (room) => setRoom(room));
-
-      newSocket?.on("users-in-a-current-room", (data) => {
-        setPlayersInRoom(data);
-      });
-    });
-
-    // Cleanup function to disconnect socket when component unmounts
-    return () => {
-      newSocket.disconnect();
-    };
-  }, []);
 
   const joinRoom = (e) => {
     e.preventDefault();
