@@ -4,52 +4,29 @@ import { useEffect, useState } from "react";
 import Rooms from "./rooms";
 import Game from "./game";
 
-import { io } from "socket.io-client";
+import { useSocketConnection } from "../../hooks/useSocketConnection";
 
 function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [playersInRoom, setPlayersInRoom] = useState([]);
-  const [room, setRoom] = useState("");
 
   // Socket Connection
-  const [socket, setSocket] = useState(null);
+  const socket = useSocketConnection();
+
   useEffect(() => {
-    const newSocket = io("http://localhost:3001");
-    setSocket(newSocket);
-
-    newSocket.on("connect", () => {
-      console.log("connected");
-
-      newSocket?.on("current-room", (room) => setRoom(room));
-
-      newSocket?.on("users-in-a-current-room", (data) => {
-        setPlayersInRoom(data);
-      });
-    });
-
-    // Cleanup function to disconnect socket when component unmounts
-    return () => {
-      newSocket.disconnect();
-    };
-  }, []);
+    socket?.on("users-in-a-current-room", (data) => setPlayersInRoom(data));
+  }, [socket]);
 
   useEffect(() => {
     playersInRoom.length == 2 ? setGameStarted(true) : setGameStarted(false);
   }, [playersInRoom]);
 
   return (
-    <main>
-      {!gameStarted && (
-        <Rooms
-          socket={socket}
-          room={room}
-          playersInRoom={playersInRoom}
-          setPlayersInRoom={setPlayersInRoom}
-        />
-      )}
+    <div>
+      {!gameStarted && <Rooms playersInRoom={playersInRoom} setPlayersInRoom={setPlayersInRoom} />}
 
       {gameStarted && <Game />}
-    </main>
+    </div>
   );
 }
 
