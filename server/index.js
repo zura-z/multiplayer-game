@@ -11,6 +11,8 @@ const io = new Server(httpServer, {
   },
 });
 
+const MAX_PLAYERS = 2;
+
 io.on("connection", (socket) => {
   socket.on("join-room", (room) => {
     socket.join(room);
@@ -19,20 +21,21 @@ io.on("connection", (socket) => {
 
     const userQuantity = io.sockets.adapter.rooms.get(room);
 
-    io.to(room).emit("users-in-a-current-room", [...userQuantity]);
-
-    socket.on("disconnect", () => {
-      io.to(room).emit("users-in-a-current-room", [...userQuantity]);
-    });
+    if ([...userQuantity].length == MAX_PLAYERS) {
+      io.emit("startGame", true, [...userQuantity]);
+    } else {
+      io.emit("startGame", false, [...userQuantity]);
+    }
   });
 
   socket.on("leave-room", (room) => {
     socket.leave(room);
-    
+
     socket.emit("current-room", "");
 
-    const userQuantity = io.sockets.adapter.rooms.get(room);
-    io.to(room).emit("users-in-a-current-room", [...userQuantity] || []);
+    const userQuantity = io.sockets.adapter.rooms.get(room) || [];
+
+    io.emit("startGame", false, [...userQuantity]);
   });
 });
 

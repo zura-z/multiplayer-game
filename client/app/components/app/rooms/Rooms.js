@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSocketConnection } from "../../../hooks/useSocketConnection";
 
-export default function Rooms({ playersInRoom, setPlayersInRoom }) {
+export default function Rooms({ playersInRoom }) {
   // Socket Connection
   const socket = useSocketConnection();
 
@@ -16,10 +16,6 @@ export default function Rooms({ playersInRoom, setPlayersInRoom }) {
     socket?.emit("join-room", input);
 
     socket?.on("current-room", (room) => setRoom(room));
-
-    socket?.on("users-in-a-current-room", (data) => {
-      setPlayersInRoom(data);
-    });
 
     setInput("");
   };

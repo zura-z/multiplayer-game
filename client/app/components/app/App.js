@@ -14,16 +14,17 @@ function App() {
   const socket = useSocketConnection();
 
   useEffect(() => {
-    socket?.on("users-in-a-current-room", (data) => setPlayersInRoom(data));
+    socket?.on("connect", () => {
+      socket?.on("startGame", (bool, data) => {
+        setGameStarted(bool);
+        setPlayersInRoom(data);
+      });
+    });
   }, [socket]);
-
-  useEffect(() => {
-    playersInRoom.length == 2 ? setGameStarted(true) : setGameStarted(false);
-  }, [playersInRoom]);
 
   return (
     <div>
-      {!gameStarted && <Rooms playersInRoom={playersInRoom} setPlayersInRoom={setPlayersInRoom} />}
+      {!gameStarted && <Rooms playersInRoom={playersInRoom} />}
 
       {gameStarted && <Game />}
     </div>
