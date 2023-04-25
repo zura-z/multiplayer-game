@@ -13,6 +13,38 @@ const io = new Server(httpServer, {
 
 const MAX_PLAYERS = 2;
 
+function startGameTimer() {
+  // Start the game length timer
+  const gameDuration = 10; // in seconds
+  let remainingGameTime = gameDuration;
+  const gameInterval = setInterval(() => {
+    remainingGameTime--;
+    io.emit("game-timer", remainingGameTime);
+
+    if (remainingGameTime === 0) {
+      clearInterval(gameInterval);
+      io.emit("game-over");
+    }
+  }, 1000);
+}
+
+function startGame() {
+  console.log("Game has started");
+
+  const warmupDuration = 5; // in seconds
+  let remainingWarmupTime = warmupDuration;
+  const warmupInterval = setInterval(() => {
+    remainingWarmupTime--;
+    io.emit("warmup-timer", remainingWarmupTime);
+
+    if (remainingWarmupTime === 0) {
+      clearInterval(warmupInterval);
+
+      startGameTimer();
+    }
+  }, 1000);
+}
+
 io.on("connection", (socket) => {
   socket.on("join-room", (room) => {
     socket.join(room);
@@ -23,6 +55,8 @@ io.on("connection", (socket) => {
 
     if ([...userQuantity].length == MAX_PLAYERS) {
       io.emit("startGame", true, [...userQuantity]);
+
+      startGame(room);
     } else {
       io.emit("startGame", false, [...userQuantity]);
     }
